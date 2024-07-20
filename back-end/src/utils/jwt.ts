@@ -10,3 +10,14 @@ export function generateToken(payload: object | string, expiresIn: string = "1d"
     expiresIn: expiresIn,
   });
 }
+
+export function isTokenTimeExpired(token: string): boolean {
+  try {
+    const decoded = jwt.decode(token, { complete: true });
+    const dateNow = new Date();
+    const dateExpire = new Date(decoded.payload.exp * 1000);
+    return dateNow > dateExpire;
+  } catch (err) {
+    return true;
+  }
+}

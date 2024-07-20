@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 
 // Importing the routes
 import authRoutes from "@/routes/auth";
+import taskRoutes from "@/routes/task";
 
 const app: Express = express();
 
@@ -23,6 +24,7 @@ app.get("/", (req, res) => res.send("Hello World from QuickEdit"));
 
 // Using the routes
 app.use(authRoutes);
+app.use(taskRoutes);
 
 // Route not found handler, must be the last route and before the global error handler, It will handle all routes that are not found
 app.all("*", (req, res) => res.status(404).json({ message: "Route not found" }));
