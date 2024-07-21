@@ -13,14 +13,7 @@ const Column: FC<ColumnType> = ({ id, title, cards }) => {
   const { setNodeRef } = useDroppable({ id: id });
   return (
     <SortableContext id={id} items={cards} strategy={rectSortingStrategy}>
-      <div
-        ref={setNodeRef}
-        style={{
-          width: "200px",
-          background: "rgba(245,247,249,1.00)",
-          marginRight: "10px",
-        }}
-      >
+      <div ref={setNodeRef} className="w-96 h-full  p-2 space-y-4">
         <p
           style={{
             padding: "5px 20px",

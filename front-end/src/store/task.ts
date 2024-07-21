@@ -1,6 +1,8 @@
+import { ApiTaskType } from "@/lib/schema";
 import { DragEndEvent, DragOverEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { create } from "zustand";
+import instance from "@/configs/axios";
 export type CardType = {
   id: string;
   title: string;
@@ -11,56 +13,12 @@ export type ColumnType = {
   cards: CardType[];
 };
 
-const data: ColumnType[] = [
-  {
-    id: "Column1",
-    title: "TODO",
-    cards: [
-      {
-        id: "Card1",
-        title: "Card1",
-      },
-      {
-        id: "Card2",
-        title: "Card2",
-      },
-    ],
-  },
-  {
-    id: "Column2",
-    title: "IN PROGRESS",
-    cards: [
-      {
-        id: "Card3",
-        title: "Card3",
-      },
-      {
-        id: "Card4",
-        title: "Card4",
-      },
-    ],
-  },
-  {
-    id: "Column3",
-    title: "DONE",
-    cards: [
-      {
-        id: "Card5",
-        title: "Card5",
-      },
-      {
-        id: "Card6",
-        title: "Card6",
-      },
-    ],
-  },
-];
-
 interface TaskState {
   columns: ColumnType[];
+  setColumns: (columns: ColumnType[]) => void;
   handleDragOver: (event: DragOverEvent) => void;
   handleDragEnd: (event: DragEndEvent) => void;
-  addTask: (title: string) => void;
+  addTask: (id: string, title: string) => void;
 }
 const findColumn = (columns: ColumnType[], unique: string | null) => {
   if (!unique) {
@@ -78,14 +36,60 @@ const findColumn = (columns: ColumnType[], unique: string | null) => {
   return columns.find((c) => c.id === columnId) ?? null;
 };
 
+export function formatTasks(tasks: ApiTaskType[]): ColumnType[] {
+  const columns: ColumnType[] = [
+    { id: "TODO", title: "TODO", cards: [] },
+    { id: "IN_PROGRESS", title: "IN PROGRESS", cards: [] },
+    { id: "DONE", title: "DONE", cards: [] },
+  ];
+
+  tasks.forEach((task) => {
+    if (task.status === "TODO") {
+      columns[0].cards.push({ id: task.id, title: task.title });
+    } else if (task.status === "IN_PROGRESS") {
+      columns[1].cards.push({ id: task.id, title: task.title });
+    } else if (task.status === "DONE") {
+      columns[2].cards.push({ id: task.id, title: task.title });
+    }
+  });
+  // Sort the cards by position
+  columns.forEach((column) => {
+    column.cards.sort((a, b) => {
+      const taskA = tasks.find((task) => task.id === a.id);
+      const taskB = tasks.find((task) => task.id === b.id);
+      return taskA!.position - taskB!.position;
+    });
+  });
+
+  return columns;
+}
+const data: ColumnType[] = [
+  {
+    id: "TODO",
+    title: "TODO",
+    cards: [],
+  },
+  {
+    id: "IN_PROGRESS",
+    title: "IN PROGRESS",
+    cards: [],
+  },
+  {
+    id: "DONE",
+    title: "DONE",
+    cards: [],
+  },
+];
+
 export const useTaskStore = create<TaskState>((set, get) => ({
   columns: data,
-  addTask: (title) => {
+  setColumns: (columns) => set({ columns }),
+  addTask: (id, title) => {
     set((prevState) => {
-      const newTask = { id: randomId(), title };
+      const newTask = { id, title };
       return {
         columns: prevState.columns.map((column) => {
-          if (column.id === "Column1") {
+          if (column.id === "TODO") {
             column.cards.unshift(newTask);
           }
           return column;
@@ -140,10 +144,14 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     const activeColumn = findColumn(columns, activeId);
     const overColumn = findColumn(columns, overId);
     if (!activeColumn || !overColumn || activeColumn !== overColumn) {
+      console.log("Invalid columns");
+
       return null;
     }
     const activeIndex = activeColumn.cards.findIndex((i) => i.id === activeId);
     const overIndex = overColumn.cards.findIndex((i) => i.id === overId);
+    rearrageInDB(overColumn, overIndex, activeId);
+
     if (activeIndex !== overIndex) {
       set((prevState) => {
         return {
@@ -161,7 +169,13 @@ export const useTaskStore = create<TaskState>((set, get) => ({
   },
 }));
 
-function randomId() {
-  return Math.random().toString(36).substr(2, 9);
-}
 export default useTaskStore;
+
+async function rearrageInDB(overColumn: ColumnType, overIndex: number, overId: string) {
+  const payload = {
+    id: overId,
+    status: overColumn.id,
+    index: overIndex,
+  };
+  await instance.post("/task/change-position", payload);
+}

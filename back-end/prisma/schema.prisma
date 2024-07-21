@@ -44,12 +44,14 @@ model Task {
   title     String
   content   String?
   status    String
+  position  Int      @default(0)
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([status, position])
   @@map("tasks")
 }
 

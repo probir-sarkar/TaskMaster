@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import useTaskStore from "@/store/task";
+import { useMutation } from "@tanstack/react-query";
+import instance from "@/configs/axios";
 
 const formSchema = z.object({
   title: z
@@ -38,10 +40,24 @@ const TaskForm = () => {
     },
   });
 
+  const addForm = useMutation({
+    mutationFn: (data: FormValues) => instance.post("/task", data),
+    onSuccess: (res) => {
+      const { data } = res;
+      console.log(data);
+      addTask(data.data.id, data.data.title);
+      form.reset();
+      setOpen(false);
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   function onSubmit(values: FormValues) {
-    addTask(values.title);
-    setOpen(false);
-    form.reset();
+    console.log(values);
+
+    addForm.mutate(values);
   }
   return (
     <>

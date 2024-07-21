@@ -1,12 +1,38 @@
-import { closestCorners, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import {
+  closestCorners,
+  DndContext,
+  DragStartEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import Column, { ColumnType } from "@/components/dnd/Column";
-import { useState } from "react";
+import Column from "@/components/dnd/Column";
 import SearchBar from "./SearchBar";
-import useTaskStore from "@/store/task";
+import useTaskStore, { formatTasks } from "@/store/task";
+import { useQuery } from "@tanstack/react-query";
+import instance from "@/configs/axios";
+import { useEffect } from "react";
+import { apiTaskListSchema } from "@/lib/schema";
 
 export default function App() {
-  const { columns, handleDragEnd, handleDragOver } = useTaskStore();
+  const { columns, handleDragEnd, handleDragOver, setColumns } = useTaskStore();
+  const { data } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: async () => {
+      const { data } = await instance.get("/task");
+      return data;
+    },
+    initialData: [],
+  });
+  useEffect(() => {
+    const validatedData = apiTaskListSchema.safeParse(data.data);
+
+    if (validatedData.data) {
+      setColumns(formatTasks(validatedData.data));
+    }
+  }, [data]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -23,7 +49,7 @@ export default function App() {
         onDragEnd={handleDragEnd}
         onDragOver={handleDragOver}
       >
-        <div className="App" style={{ display: "flex", flexDirection: "row", padding: "20px" }}>
+        <div className="flex flex-row p-5">
           {columns.map((column) => (
             <Column key={column.id} id={column.id} title={column.title} cards={column.cards}></Column>
           ))}

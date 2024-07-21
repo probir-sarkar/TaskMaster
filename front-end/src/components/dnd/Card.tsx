@@ -13,20 +13,21 @@ const Card: FC<CardType> = ({ id, title }) => {
   });
 
   const style = {
-    margin: "10px",
-    opacity: 1,
-    color: "#333",
-    background: "white",
-    padding: "10px",
     transform: CSS.Transform.toString(transform),
   };
 
   return (
     // attributes、listenersはDOMイベントを検知するために利用します。
     // listenersを任意の領域に付与することで、ドラッグするためのハンドルを作ることもできます。
-    <div ref={setNodeRef} {...attributes} {...listeners} style={style}>
+    <div
+      className="bg-white border border-black rounded px-2 py-4"
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      style={style}
+    >
       <div id={id}>
-        <p>{title}</p>
+        <p>{id}</p>
       </div>
     </div>
   );

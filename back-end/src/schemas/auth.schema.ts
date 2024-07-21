@@ -7,3 +7,7 @@ export const googleCallbackSchema = z.object({
   email_verified: z.boolean(),
   sub: z.string(),
 });
+
+export const jwtPayloadSchema = z.object({
+  id: z.number(),
+});
