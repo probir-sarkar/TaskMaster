@@ -12,11 +12,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import useTaskStore from "@/store/task";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import instance from "@/configs/axios";
 
 const formSchema = z.object({
@@ -25,33 +24,35 @@ const formSchema = z.object({
     .min(3, "Task name should be at least 3 characters long")
     .max(100, "Task name should not exceed 100 characters"),
   description: z.string().max(500, "Description should not exceed 500 characters").optional(),
+  deadline: z.string().date()
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 const TaskForm = () => {
-  const { addTask } = useTaskStore();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
       description: "",
-    },
+      deadline: ""
+    }
   });
 
   const addForm = useMutation({
     mutationFn: (data: FormValues) => instance.post("/task", data),
     onSuccess: (res) => {
-      const { data } = res;
-      console.log(data);
-      addTask(data.data.id, data.data.title);
+      queryClient.invalidateQueries({
+        queryKey: ["tasks"]
+      });
       form.reset();
       setOpen(false);
     },
     onError: (error) => {
       console.log(error);
-    },
+    }
   });
 
   function onSubmit(values: FormValues) {
@@ -96,6 +97,19 @@ const TaskForm = () => {
                       <FormLabel>Description</FormLabel>
                       <FormControl>
                         <Textarea placeholder="Description" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="deadline"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Deadline</FormLabel>
+                      <FormControl>
+                        <Input type="date" min={new Date().toISOString().split("T")[0]} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

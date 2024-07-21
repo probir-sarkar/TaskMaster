@@ -1,12 +1,10 @@
 import { ApiTaskType } from "@/lib/schema";
-import { DragEndEvent, DragOverEvent } from "@dnd-kit/core";
+import { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { create } from "zustand";
 import instance from "@/configs/axios";
-export type CardType = {
-  id: string;
-  title: string;
-};
+import { CardType } from "@/components/dnd/Card";
+
 export type ColumnType = {
   id: string;
   title: string;
@@ -15,10 +13,11 @@ export type ColumnType = {
 
 interface TaskState {
   columns: ColumnType[];
+  activeId?: string | null;
   setColumns: (columns: ColumnType[]) => void;
   handleDragOver: (event: DragOverEvent) => void;
   handleDragEnd: (event: DragEndEvent) => void;
-  addTask: (id: string, title: string) => void;
+  handleDragStart: (event: DragStartEvent) => void;
 }
 const findColumn = (columns: ColumnType[], unique: string | null) => {
   if (!unique) {
@@ -40,16 +39,22 @@ export function formatTasks(tasks: ApiTaskType[]): ColumnType[] {
   const columns: ColumnType[] = [
     { id: "TODO", title: "TODO", cards: [] },
     { id: "IN_PROGRESS", title: "IN PROGRESS", cards: [] },
-    { id: "DONE", title: "DONE", cards: [] },
+    { id: "DONE", title: "DONE", cards: [] }
   ];
 
   tasks.forEach((task) => {
+    const newCard = {
+      id: task.id,
+      title: task.title,
+      content: task.content,
+      createdAt: new Date(task.createdAt)
+    };
     if (task.status === "TODO") {
-      columns[0].cards.push({ id: task.id, title: task.title });
+      columns[0].cards.push(newCard);
     } else if (task.status === "IN_PROGRESS") {
-      columns[1].cards.push({ id: task.id, title: task.title });
+      columns[1].cards.push(newCard);
     } else if (task.status === "DONE") {
-      columns[2].cards.push({ id: task.id, title: task.title });
+      columns[2].cards.push(newCard);
     }
   });
   // Sort the cards by position
@@ -67,35 +72,27 @@ const data: ColumnType[] = [
   {
     id: "TODO",
     title: "TODO",
-    cards: [],
+    cards: []
   },
   {
     id: "IN_PROGRESS",
     title: "IN PROGRESS",
-    cards: [],
+    cards: []
   },
   {
     id: "DONE",
     title: "DONE",
-    cards: [],
-  },
+    cards: []
+  }
 ];
 
 export const useTaskStore = create<TaskState>((set, get) => ({
   columns: data,
   setColumns: (columns) => set({ columns }),
-  addTask: (id, title) => {
-    set((prevState) => {
-      const newTask = { id, title };
-      return {
-        columns: prevState.columns.map((column) => {
-          if (column.id === "TODO") {
-            column.cards.unshift(newTask);
-          }
-          return column;
-        }),
-      };
-    });
+  activeId: null,
+  handleDragStart: (event) => {
+    const { active } = event;
+    set({ activeId: String(active.id) });
   },
   handleDragOver: (event) => {
     const columns = get().columns;
@@ -126,17 +123,18 @@ export const useTaskStore = create<TaskState>((set, get) => ({
             c.cards = [
               ...overItems.slice(0, newIndex()),
               activeItems[activeIndex],
-              ...overItems.slice(newIndex(), overItems.length),
+              ...overItems.slice(newIndex(), overItems.length)
             ];
             return c;
           } else {
             return c;
           }
-        }),
+        })
       };
     });
   },
   handleDragEnd: (event) => {
+    set({ activeId: null });
     const columns = get().columns;
     const { active, over } = event;
     const activeId = String(active.id);
@@ -162,11 +160,11 @@ export const useTaskStore = create<TaskState>((set, get) => ({
             } else {
               return column;
             }
-          }),
+          })
         };
       });
     }
-  },
+  }
 }));
 
 export default useTaskStore;
@@ -175,7 +173,7 @@ async function rearrageInDB(overColumn: ColumnType, overIndex: number, overId: s
   const payload = {
     id: overId,
     status: overColumn.id,
-    index: overIndex,
+    index: overIndex
   };
   await instance.post("/task/change-position", payload);
 }

@@ -6,6 +6,7 @@ export const apiTaskSchema = z.object({
   content: z.string().optional(),
   status: z.string(),
   position: z.number(),
+  createdAt: z.string()
 });
 
 export const apiTaskListSchema = z.array(apiTaskSchema);

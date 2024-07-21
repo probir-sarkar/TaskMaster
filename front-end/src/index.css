@@ -67,3 +67,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* global font apply */
+@layer components {
+  body {
+    font-family: "Poppins", sans-serif;
+  }
+}

@@ -13,20 +13,14 @@ const Column: FC<ColumnType> = ({ id, title, cards }) => {
   const { setNodeRef } = useDroppable({ id: id });
   return (
     <SortableContext id={id} items={cards} strategy={rectSortingStrategy}>
-      <div ref={setNodeRef} className="w-96 h-full  p-2 space-y-4">
-        <p
-          style={{
-            padding: "5px 20px",
-            textAlign: "left",
-            fontWeight: "500",
-            color: "#575757",
-          }}
-        >
-          {title}
-        </p>
-        {cards.map((card) => (
-          <Card key={card.id} id={card.id} title={card.title}></Card>
-        ))}
+      <div ref={setNodeRef} className="w-full border border-gray-400 shadow-md rounded-lg p-4 space-y-2">
+        <p className="bg-[#559af9] p-2 text-white rounded-sm font-semibold">{title}</p>
+
+        <div className="h-[25rem] overflow-y-auto space-y-2">
+          {cards.map((card) => (
+            <Card key={card.id} {...card}></Card>
+          ))}
+        </div>
       </div>
     </SortableContext>
   );
