@@ -20,6 +20,7 @@ model User {
   additionalInfo AdditionalInfo[]
   role           UserRole         @default(USER)
   status         UserStatus       @default(ACTIVE)
+  Task           Task[]
 
   @@index([email])
   @@map("users")
@@ -36,6 +37,20 @@ model AdditionalInfo {
 
   @@index([userId])
   @@map("additional_info")
+}
+
+model Task {
+  id        String   @id @default(uuid())
+  title     String
+  content   String?
+  Status    String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("tasks")
 }
 
 enum SignupMethod {

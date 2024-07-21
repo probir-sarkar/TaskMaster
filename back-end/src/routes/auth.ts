@@ -3,6 +3,7 @@ import prisma from "@/configs/prisma";
 import passport from "@/configs/passport";
 import { googleCallbackSchema } from "@/schemas/auth.schema";
 import { generateToken, verifyToken } from "@/utils/jwt";
+import { authenticate } from "@/middlewares/authMiddleware";
 
 const router = Router();
 
@@ -30,7 +31,7 @@ router.get(
     if (foundUser) {
       const token = generateToken({ id: foundUser.id, name: foundUser.name });
       res.cookie("token", token, cookieParams());
-      return res.json({ message: "User already exists", user: foundUser });
+      return res.redirect("http://localhost:5173/task");
     }
     const newUser = await prisma.user.create({
       data: {
@@ -46,8 +47,16 @@ router.get(
     });
     const token = generateToken({ id: newUser.id, name: newUser.name });
     res.cookie("token", token, cookieParams());
-    res.json({ message: "User created successfully", user: newUser });
+    return res.redirect("http://localhost:5173/task");
   }
 );
 
+router.get("/auth/logout", (req, res) => {
+  res.clearCookie("token");
+  res.json({ message: "Logout successfully" });
+});
+
+router.get("/auth/verify", authenticate, (req, res) => {
+  res.json({ success: true, message: "User is authenticated", user: req.user });
+});
 export default router;
