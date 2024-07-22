@@ -11,7 +11,7 @@ export function cookieParams(): CookieOptions {
   return {
     maxAge: 24 * 60 * 60 * 1000,
     httpOnly: true,
-    secure: true,
+    secure: true
   };
 }
 
@@ -19,7 +19,7 @@ router.get("/auth/google", passport.authenticate("google", { scope: ["profile", 
 
 router.get(
   "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/login", session: false }),
+  passport.authenticate("google", { failureRedirect: `${process.env.CLIENT_URL}/login`, session: false }),
   async function (req, res) {
     if (!req.user) return res.status(500).json({ message: "Internal server error" });
     const verifiedUser = googleCallbackSchema.safeParse(req.user);
@@ -31,7 +31,7 @@ router.get(
     if (foundUser) {
       const token = generateToken({ id: foundUser.id, name: foundUser.name });
       res.cookie("token", token, cookieParams());
-      return res.redirect("http://localhost:5173/task");
+      return res.redirect(`${process.env.CLIENT_URL}/task`);
     }
     const newUser = await prisma.user.create({
       data: {
@@ -40,14 +40,14 @@ router.get(
         photo: picture,
         additionalInfo: {
           create: {
-            signupMethod: "GOOGLE",
-          },
-        },
-      },
+            signupMethod: "GOOGLE"
+          }
+        }
+      }
     });
     const token = generateToken({ id: newUser.id, name: newUser.name });
     res.cookie("token", token, cookieParams());
-    return res.redirect("http://localhost:5173/task");
+    return res.redirect(`${process.env.CLIENT_URL}/task`);
   }
 );
 
