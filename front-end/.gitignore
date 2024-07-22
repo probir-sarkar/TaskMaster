@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 .env
+
+yarn.lock
+yarn-error.log
