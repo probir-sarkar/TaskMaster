@@ -56,7 +56,7 @@ const TaskForm = () => {
       }
       return instance.post("/task", data);
     },
-    onSuccess: (res) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["tasks"]
       });

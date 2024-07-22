@@ -2,13 +2,12 @@ import {
   closestCorners,
   DndContext,
   DragOverlay,
-  DragStartEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors
 } from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import Column from "@/components/dnd/Column";
 import SearchBar from "./SearchBar";
 import useTaskStore, { formatTasks } from "@/store/task";
