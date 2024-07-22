@@ -4,6 +4,7 @@ import { arrayMove } from "@dnd-kit/sortable";
 import { create } from "zustand";
 import instance from "@/configs/axios";
 import { CardType } from "@/components/dnd/Card";
+import { dateExtractor } from "@/lib/utils";
 
 export type ColumnType = {
   id: string;
@@ -14,6 +15,7 @@ export type ColumnType = {
 interface TaskState {
   columns: ColumnType[];
   activeId?: string | null;
+  activeItem?: CardType | null;
   setColumns: (columns: ColumnType[]) => void;
   handleDragOver: (event: DragOverEvent) => void;
   handleDragEnd: (event: DragEndEvent) => void;
@@ -47,7 +49,8 @@ export function formatTasks(tasks: ApiTaskType[]): ColumnType[] {
       id: task.id,
       title: task.title,
       content: task.content,
-      createdAt: new Date(task.createdAt)
+      createdAt: new Date(task.createdAt),
+      deadline: dateExtractor(task.deadline)
     };
     if (task.status === "TODO") {
       columns[0].cards.push(newCard);
@@ -89,10 +92,15 @@ const data: ColumnType[] = [
 export const useTaskStore = create<TaskState>((set, get) => ({
   columns: data,
   setColumns: (columns) => set({ columns }),
-  activeId: null,
+  activeItem: null,
   handleDragStart: (event) => {
     const { active } = event;
-    set({ activeId: String(active.id) });
+    const activeItem = get()
+      .columns.flatMap((c) => c.cards)
+      .find((i) => i.id === active.id);
+    if (activeItem) {
+      set({ activeItem });
+    }
   },
   handleDragOver: (event) => {
     const columns = get().columns;
@@ -134,7 +142,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     });
   },
   handleDragEnd: (event) => {
-    set({ activeId: null });
+    set({ activeItem: null });
     const columns = get().columns;
     const { active, over } = event;
     const activeId = String(active.id);

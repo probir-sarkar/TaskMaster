@@ -36,6 +36,26 @@ export const addTask: RequestHandler = async (req, res) => {
   res.status(201).json({ success: true, data: result });
 };
 
+export const updateTask: RequestHandler = async (req, res) => {
+  const { id } = req.params;
+  if (!id) return res.status(400).json({ success: false, message: "Task ID is required" });
+  const task = TaskSchema.parse(req.body);
+  const user = jwtPayloadSchema.parse(req.user);
+
+  const result = await prisma.task.update({
+    where: {
+      id: id,
+      userId: user.id
+    },
+    data: {
+      title: task.title,
+      content: task.content,
+      deadline: task.deadline
+    }
+  });
+  res.json({ success: true, data: result });
+};
+
 export const deleteTask: RequestHandler = async (req, res) => {
   const { id } = req.params;
   if (!id) return res.status(400).json({ success: false, message: "Task ID is required" });

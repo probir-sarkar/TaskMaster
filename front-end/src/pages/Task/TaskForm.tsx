@@ -14,35 +14,48 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
-import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import instance from "@/configs/axios";
+import { useFormStore } from "@/store/form";
+import { useEffect } from "react";
+import { dateExtractor } from "@/lib/utils";
 
 const formSchema = z.object({
   title: z
     .string()
     .min(3, "Task name should be at least 3 characters long")
     .max(100, "Task name should not exceed 100 characters"),
-  description: z.string().max(500, "Description should not exceed 500 characters").optional(),
-  deadline: z.string().date()
+  content: z.string().max(500, "Description should not exceed 500 characters").optional(),
+  deadline: z.string().date().optional()
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 const TaskForm = () => {
   const queryClient = useQueryClient();
-  const [open, setOpen] = useState(false);
+  const { open, setOpen, editItem } = useFormStore();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      description: "",
+      content: "",
       deadline: ""
     }
   });
 
+  useEffect(() => {
+    if (editItem) {
+      form.reset({ ...editItem });
+    }
+  }, [editItem]);
+
   const addForm = useMutation({
-    mutationFn: (data: FormValues) => instance.post("/task", data),
+    mutationFn: (data: FormValues) => {
+      if (editItem) {
+        return instance.put(`/task/${editItem.id}`, data);
+      }
+      return instance.post("/task", data);
+    },
     onSuccess: (res) => {
       queryClient.invalidateQueries({
         queryKey: ["tasks"]
@@ -56,20 +69,23 @@ const TaskForm = () => {
   });
 
   function onSubmit(values: FormValues) {
-    console.log(values);
-
     addForm.mutate(values);
   }
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button>Add Task</Button>
-        </DialogTrigger>
+        <Button
+          onClick={() => {
+            setOpen(true);
+            form.reset();
+          }}
+        >
+          Add Task
+        </Button>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Add New Task</DialogTitle>
-            <DialogDescription>Fill in the form below to add a new task to your board.</DialogDescription>
+            <DialogTitle>{editItem ? "Edit Task" : "Add Task"}</DialogTitle>
+            <DialogDescription>Fill in the form below to add or edit a task to your board.</DialogDescription>
           </DialogHeader>
           <div className="">
             <Form {...form}>
@@ -91,7 +107,7 @@ const TaskForm = () => {
                 />
                 <FormField
                   control={form.control}
-                  name="description"
+                  name="content"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Description</FormLabel>

@@ -1,6 +1,6 @@
 import { CookieOptions, Router } from "express";
 import { authenticate } from "@/middlewares/authMiddleware";
-import { addTask, getTasks, task, changePosition, deleteTask } from "@/controllers/taskController";
+import { addTask, getTasks, task, changePosition, deleteTask, updateTask } from "@/controllers/taskController";
 import tryCatch from "@/utils/tryCatch";
 
 const router = Router();
@@ -8,8 +8,7 @@ const router = Router();
 router.use(authenticate);
 
 router.route("/task").get(tryCatch(getTasks)).post(tryCatch(addTask));
-router.route("/task/:id").delete(tryCatch(deleteTask));
-
+router.route("/task/:id").delete(tryCatch(deleteTask)).put(tryCatch(updateTask));
 router.post("/task/change-position", tryCatch(changePosition));
 
 export default router;

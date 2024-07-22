@@ -16,10 +16,10 @@ import { useQuery } from "@tanstack/react-query";
 import instance from "@/configs/axios";
 import { useEffect } from "react";
 import { apiTaskListSchema } from "@/lib/schema";
-import Item, { Draggable } from "@/components/dnd/Item";
+import DragItem from "@/components/dnd/DragItem";
 
 export default function App() {
-  const { columns, handleDragEnd, handleDragOver, setColumns, activeId, handleDragStart } = useTaskStore();
+  const { columns, handleDragEnd, handleDragOver, setColumns, activeItem, handleDragStart } = useTaskStore();
   const { data } = useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
@@ -28,8 +28,8 @@ export default function App() {
     },
     initialData: []
   });
+  const validatedData = apiTaskListSchema.safeParse(data.data);
   useEffect(() => {
-    const validatedData = apiTaskListSchema.safeParse(data.data);
     if (validatedData.data) {
       setColumns(formatTasks(validatedData.data));
     }
@@ -60,7 +60,7 @@ export default function App() {
             <Column key={column.id} id={column.id} title={column.title} cards={column.cards}></Column>
           ))}
         </div>
-        <DragOverlay>{activeId ? <Item id={activeId} title="Title" createdAt={new Date()} /> : null}</DragOverlay>
+        <DragOverlay>{activeItem ? <DragItem card={activeItem} /> : null}</DragOverlay>
       </DndContext>
     </main>
   );

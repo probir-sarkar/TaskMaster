@@ -1,24 +1,27 @@
 import App from "@/App";
 import Task from "@/pages/Task";
 import { RouteObject } from "react-router-dom";
-// import ProtectedRoute from "@/components/ProtectedRoute";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import LoginPage from "./pages/Login";
+import NavBar from "./components/NavBar";
 
 export const routes: RouteObject[] = [
   {
     path: "/",
-    element: <App />,
+    element: <App />
   },
   {
     path: "/login",
-    element: <LoginPage />,
+    element: <LoginPage />
   },
   {
     path: "/task",
     element: (
-      // <ProtectedRoute>
-      <Task />
-      // </ProtectedRoute>
-    ),
-  },
+      <ProtectedRoute>
+        <NavBar>
+          <Task />
+        </NavBar>
+      </ProtectedRoute>
+    )
+  }
 ];

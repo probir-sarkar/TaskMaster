@@ -6,7 +6,8 @@ export const apiTaskSchema = z.object({
   content: z.string().optional(),
   status: z.string(),
   position: z.number(),
-  createdAt: z.string()
+  createdAt: z.string(),
+  deadline: z.string().or(z.null()).optional().default("")
 });
 
 export const apiTaskListSchema = z.array(apiTaskSchema);
