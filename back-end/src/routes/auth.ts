@@ -55,7 +55,13 @@ router.get(
 );
 
 router.get("/auth/logout", (req, res) => {
-  res.clearCookie("token");
+  res.cookie("token", "",{
+    maxAge: 0, 
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict',
+    domain: '.probir.dev' 
+  });
   res.json({ message: "Logout successfully" });
 });
 
