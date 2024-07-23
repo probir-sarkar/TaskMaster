@@ -5,9 +5,15 @@ export const googleCallbackSchema = z.object({
   picture: z.string().optional(),
   email: z.string().email(),
   email_verified: z.boolean(),
-  sub: z.string(),
+  sub: z.string()
 });
 
 export const jwtPayloadSchema = z.object({
-  id: z.number(),
+  id: z.number()
+});
+
+export const signupSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+  name: z.string()
 });

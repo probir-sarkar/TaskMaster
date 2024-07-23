@@ -11,15 +11,15 @@ datasource db {
 }
 
 model User {
-  id             Int              @id @default(autoincrement())
-  email          String           @unique
+  id             Int             @id @default(autoincrement())
+  email          String          @unique
   name           String?
   photo          String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  additionalInfo AdditionalInfo[]
-  role           UserRole         @default(USER)
-  status         UserStatus       @default(ACTIVE)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  additionalInfo AdditionalInfo?
+  role           UserRole        @default(USER)
+  status         UserStatus      @default(ACTIVE)
   Task           Task[]
 
   @@index([email])
@@ -29,7 +29,7 @@ model User {
 model AdditionalInfo {
   id           Int          @id @default(autoincrement())
   password     String?
-  userId       Int
+  userId       Int          @unique
   signupMethod SignupMethod @default(EMAIL)
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime     @default(now())

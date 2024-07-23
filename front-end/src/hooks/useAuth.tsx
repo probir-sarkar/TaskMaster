@@ -2,7 +2,9 @@
 import { useState, useLayoutEffect } from "react";
 import instance from "@/configs/axios";
 import { useNavigate } from "react-router-dom";
-
+import { toast } from "sonner";
+import type { FormValues as LoginFormData } from "@/pages/Login";
+import type { FormValues as SignupFormData } from "@/pages/Signup";
 const useAuth = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,7 +17,7 @@ const useAuth = () => {
       setUser(response.data.user);
     } catch (error) {
       setUser(null);
-      navigate("/login");
+      // navigate("/login");
     } finally {
       setLoading(false);
     }
@@ -30,6 +32,7 @@ const useAuth = () => {
       await instance.get("/auth/logout");
       setUser(null);
       navigate("/login");
+      toast.success("Logged out successfully");
     } catch (error) {
       console.error("Error logging out", error);
     }
@@ -41,12 +44,41 @@ const useAuth = () => {
       console.error("Error logging in with Google", error);
     }
   };
+  const login = async (data: LoginFormData) => {
+    const { email, password } = data;
+    try {
+      const response = await instance.post("/auth/login", { email, password });
+      if (response.data.success) {
+        toast.success("Logged in successfully");
+        navigate("/");
+      } else if (response.data.success === false) {
+        toast.error(response.data.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    } catch (error) {
+      console.error("Error logging in", error);
+    }
+  };
+  const signup = async (data: SignupFormData) => {
+    const { name, email, password } = data;
+    try {
+      const response = await instance.post("/auth/signup", { name, email, password });
+      if (response.data.success) {
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Error signing up", error);
+    }
+  };
 
   return {
     logout,
     user,
     loading,
     loginWithGoogle,
+    login,
+    signup
   };
 };
 
