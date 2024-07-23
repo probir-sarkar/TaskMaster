@@ -14,7 +14,7 @@ export function cookieParams(): CookieOptions {
     httpOnly: true,
     secure: true,
     sameSite: 'strict',
-    domain: 'voosh-api.coolify.probir.dev' // Set domain attribute if necessary
+    domain: '.probir.dev' // Set domain attribute if necessary
   };
 }
 
