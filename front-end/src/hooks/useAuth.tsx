@@ -17,7 +17,6 @@ const useAuth = () => {
       setUser(response.data.user);
     } catch (error) {
       setUser(null);
-      // navigate("/login");
     } finally {
       setLoading(false);
     }
@@ -35,6 +34,7 @@ const useAuth = () => {
       toast.success("Logged out successfully");
     } catch (error) {
       console.error("Error logging out", error);
+      toast.error("Something went wrong");
     }
   };
   const loginWithGoogle = () => {
@@ -42,6 +42,7 @@ const useAuth = () => {
       window.location.href = "http://localhost:8080/auth/google";
     } catch (error) {
       console.error("Error logging in with Google", error);
+      toast.error("Something went wrong");
     }
   };
   const login = async (data: LoginFormData) => {
@@ -52,12 +53,13 @@ const useAuth = () => {
         toast.success("Logged in successfully");
         navigate("/");
       } else if (response.data.success === false) {
-        toast.error(response.data.message);
+        toast.warning(response.data.message);
       } else {
         toast.error("Something went wrong");
       }
     } catch (error) {
       console.error("Error logging in", error);
+      toast.error("Something went wrong");
     }
   };
   const signup = async (data: SignupFormData) => {
@@ -65,10 +67,16 @@ const useAuth = () => {
     try {
       const response = await instance.post("/auth/signup", { name, email, password });
       if (response.data.success) {
-        navigate("/login");
+        toast.success("Logged in successfully");
+        navigate("/");
+      } else if (response.data.success === false) {
+        toast.warning(response.data.message);
+      } else {
+        toast.error("Something went wrong");
       }
     } catch (error) {
       console.error("Error signing up", error);
+      toast.error("Something went wrong");
     }
   };
 
