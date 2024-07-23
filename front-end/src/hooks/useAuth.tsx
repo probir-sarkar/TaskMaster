@@ -39,7 +39,7 @@ const useAuth = () => {
   };
   const loginWithGoogle = () => {
     try {
-      window.location.href = "http://localhost:8080/auth/google";
+      window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
     } catch (error) {
       console.error("Error logging in with Google", error);
       toast.error("Something went wrong");

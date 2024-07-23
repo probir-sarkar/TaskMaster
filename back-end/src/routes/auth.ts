@@ -48,7 +48,7 @@ router.get(
     });
     const token = generateToken({ id: newUser.id, name: newUser.name });
     res.cookie("token", token, cookieParams());
-    return res.redirect(`${process.env.CLIENT_URL}/task`);
+    return res.redirect(`${process.env.CLIENT_URL}`);
   }
 );
 

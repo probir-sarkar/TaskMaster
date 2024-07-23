@@ -5,7 +5,7 @@ import env from "@/env";
 const googleConfig = {
   clientID: env.googleClientId,
   clientSecret: env.googleClientSecret,
-  callbackURL: "http://localhost:8080/auth/google/callback",
+  callbackURL: `${process.env.BASE_URL}/auth/google/callback`
 };
 passport.use(
   new GoogleStrategy(googleConfig, (accessToken, refreshToken, profile, done) => {
