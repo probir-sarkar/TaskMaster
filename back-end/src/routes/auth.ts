@@ -10,10 +10,11 @@ const router = Router();
 
 export function cookieParams(): CookieOptions {
   return {
-    maxAge: 24 * 60 * 60 * 1000,
-    // httpOnly: true,
-    // secure: true,
-    // sameSite: 'lax'
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict',
+    domain: 'voosh-api.coolify.probir.dev' // Set domain attribute if necessary
   };
 }
 
