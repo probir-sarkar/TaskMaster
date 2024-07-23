@@ -12,7 +12,8 @@ export function cookieParams(): CookieOptions {
   return {
     maxAge: 24 * 60 * 60 * 1000,
     httpOnly: true,
-    secure: true
+    secure: true,
+    sameSite: 'lax'
   };
 }
 
