@@ -29,16 +29,18 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+const defaultValues = {
+  title: "",
+  content: "",
+  deadline: ""
+};
+
 const TaskForm = () => {
   const queryClient = useQueryClient();
   const { open, setOpen, editItem } = useFormStore();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-      content: "",
-      deadline: ""
-    }
+    defaultValues
   });
 
   useEffect(() => {
@@ -70,76 +72,74 @@ const TaskForm = () => {
     addForm.mutate(values);
   }
   return (
-    <>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <Button
-          onClick={() => {
-            setOpen(true);
-            form.reset();
-          }}
-        >
-          Add Task
-        </Button>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{editItem ? "Edit Task" : "Add Task"}</DialogTitle>
-            <DialogDescription>Fill in the form below to add or edit a task to your board.</DialogDescription>
-          </DialogHeader>
-          <div className="">
-            <Form {...form}>
-              <form id="task-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Task Name <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="shadcn" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="content"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Description" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="deadline"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Deadline</FormLabel>
-                      <FormControl>
-                        <Input type="date" min={new Date().toISOString().split("T")[0]} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </form>
-            </Form>
-          </div>
-          <DialogFooter>
-            <Button type="submit" form="task-form">
-              Save changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <Button
+        onClick={() => {
+          setOpen(true);
+          form.reset({ ...defaultValues });
+        }}
+      >
+        Add Task
+      </Button>
+      <DialogContent className="sm:max-w-[425px] w-11/12 rounded-md">
+        <DialogHeader>
+          <DialogTitle>{editItem ? "Edit Task" : "Add Task"}</DialogTitle>
+          <DialogDescription>Fill in the form below to add or edit a task to your board.</DialogDescription>
+        </DialogHeader>
+        <div className="">
+          <Form {...form}>
+            <form id="task-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Task Name <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="shadcn" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Description" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="deadline"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Deadline</FormLabel>
+                    <FormControl>
+                      <Input type="date" min={new Date().toISOString().split("T")[0]} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
+        </div>
+        <DialogFooter>
+          <Button type="submit" form="task-form">
+            Save changes
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

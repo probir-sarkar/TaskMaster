@@ -28,10 +28,10 @@ const LoginPage = () => {
   }
   if (user) return <Navigate to="/" />;
   return (
-    <div className="flex items-center justify-center h-screen bg-background">
+    <div className="flex items-center justify-center h-screen bg-background mx-6">
       <div className="max-w-md w-full space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">Welcome back!</h1>
+          <h1 className="text-3xl font-bold mb-2">Task Master</h1>
           <p className="text-muted-foreground">Enter your credentials to access your account.</p>
         </div>
         <div className="space-y-4">

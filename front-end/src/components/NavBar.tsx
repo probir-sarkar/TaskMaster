@@ -4,9 +4,9 @@ const NavBar = ({ children }: { children: React.ReactNode }) => {
   const { user, loginWithGoogle, logout } = useAuth();
   return (
     <div>
-      <nav className="w-full h-16 bg-primary sticky top-0 flex justify-between items-center md:px-10 px-5">
+      <nav className="w-full h-16 bg-primary sticky top-0 flex justify-between items-center md:px-10 px-5 z-10">
         <div className="max-w-7xl w-11/12 mx-auto h-full flex items-center justify-between">
-          <h1 className="text-white text-2xl font-bold">Task Board</h1>
+          <h1 className="text-white text-2xl font-bold">Task Master</h1>
         </div>
         <div className="">
           {user ? (

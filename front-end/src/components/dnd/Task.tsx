@@ -5,19 +5,20 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import instance from "@/configs/axios";
 import { Loader2 } from "lucide-react";
 import { useFormStore } from "@/store/form";
+import { toast } from "sonner";
 const Task: FC<CardType> = ({ id, title, content = "", createdAt, deadline }) => {
   const queryClient = useQueryClient();
   const { setOpen, setEditItem } = useFormStore();
   const deleteTask = useMutation({
     mutationFn: () => instance.delete(`/task/${id}`),
     onSuccess: () => {
-      console.log("Task deleted");
       queryClient.invalidateQueries({
         queryKey: ["tasks"]
       });
+      toast.success("Task deleted successfully");
     },
     onError: (error) => {
-      console.log(error);
+      toast.error("Failed to delete task");
     }
   });
   return (

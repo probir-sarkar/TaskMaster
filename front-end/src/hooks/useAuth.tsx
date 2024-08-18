@@ -1,5 +1,5 @@
 // src/hooks/useAuth.js
-import { useState, useLayoutEffect } from "react";
+import { useState, useLayoutEffect, useEffect, useRef } from "react";
 import instance from "@/configs/axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -8,9 +8,12 @@ import type { FormValues as SignupFormData } from "@/pages/Signup";
 const useAuth = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [fetching, setFetching] = useState(false);
   const navigate = useNavigate();
+  const isFirstLoad = useRef(true);
 
   const checkAuth = async () => {
+    setLoading(true);
     try {
       const response = await instance.get("/auth/verify");
       if (!response.data.success) throw new Error("User is not authenticated");
@@ -19,11 +22,15 @@ const useAuth = () => {
       setUser(null);
     } finally {
       setLoading(false);
+      setFetching(false);
     }
   };
 
   useLayoutEffect(() => {
-    checkAuth();
+    if (isFirstLoad.current && !fetching) {
+      checkAuth();
+      isFirstLoad.current = false; // Set the flag to false after first load
+    }
   }, []);
 
   const logout = async () => {
