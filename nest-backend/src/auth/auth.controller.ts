@@ -6,6 +6,7 @@ import type { Response } from "express";
 import { CookieAuthGuard } from "./auth.guard";
 import { ConfigService } from "@nestjs/config";
 import { SignupDto } from "./dto/signup.dto";
+import { LoginDto } from "./dto/login.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -17,6 +18,11 @@ export class AuthController {
   @Post("signup")
   signup(@Body() signupDto: SignupDto) {
     return this.authService.signup(signupDto);
+  }
+
+  @Post("login")
+  login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
   }
 
   @Get("google")
