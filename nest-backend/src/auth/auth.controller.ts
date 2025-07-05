@@ -4,10 +4,14 @@ import { AuthGuard } from "@nestjs/passport";
 import { GoogleUserRequest } from "./strategies/google.strategy";
 import type { Response } from "express";
 import { CookieAuthGuard } from "./auth.guard";
+import { ConfigService } from "@nestjs/config";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Get("google")
   @UseGuards(AuthGuard("google"))
@@ -35,6 +39,7 @@ export class AuthController {
       httpOnly: true,
       secure: true,
       sameSite: "strict",
+      domain: this.configService.get("domain"),
     });
     return res.json({ message: "Logout successfully" });
   }

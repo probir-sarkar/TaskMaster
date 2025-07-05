@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, Put } from "@nestjs/common";
 import { TaskService } from "./task.service";
 import { CreateTaskDto } from "./dto/create-task.dto";
 import { UpdateTaskDto } from "./dto/update-task.dto";
@@ -26,7 +26,7 @@ export class TaskController {
     return this.taskService.findOne(+id);
   }
 
-  @Patch(":id")
+  @Put(":id")
   @UseGuards(CookieAuthGuard)
   update(@Param("id") id: string, @Req() req: RequestWithUser, @Body() updateTaskDto: UpdateTaskDto) {
     return this.taskService.update(id, req.user.id, updateTaskDto);

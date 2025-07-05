@@ -49,7 +49,11 @@ export class TaskService {
         id: id,
         userId: userId,
       },
-      data: updateTaskDto,
+      data: {
+        title: updateTaskDto.title,
+        content: updateTaskDto.content,
+        deadline: updateTaskDto.deadline,
+      },
     });
     return { success: true, data: result };
   }

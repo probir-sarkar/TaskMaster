@@ -6,4 +6,5 @@ export default () => ({
   googleClientId: process.env.GOOGLE_CLIENT_ID,
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
   jwtSecret: process.env.JWT_SECRET,
+  domain: process.env.DOMAIN,
 });

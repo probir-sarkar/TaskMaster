@@ -4,12 +4,14 @@ import { GoogleUserRequest } from "./strategies/google.strategy";
 import { JwtService } from "@nestjs/jwt";
 import type { CookieOptions, Response } from "express";
 import { JwtPayload } from "./auth.guard";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
   async googleAuthCallback(req: GoogleUserRequest, res: Response) {
     const user = req.user;
@@ -39,11 +41,13 @@ export class AuthService {
     return res.redirect(`${process.env.CLIENT_URL}`);
   }
 
-  cookieParams: CookieOptions = {
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    // domain: ".probir.dev"
-  };
+  get cookieParams(): CookieOptions {
+    return {
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      domain: this.configService.get<string>("domain"),
+    };
+  }
 }
