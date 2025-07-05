@@ -16,12 +16,24 @@ export class AuthController {
   ) {}
 
   @Post("signup")
-  async signup(@Body() signupDto: SignupDto, @Res() res: Response) {
-    return this.authService.signup(signupDto, res);
+  async signup(
+    @Body() signupDto: SignupDto,
+    @Res({
+      passthrough: true,
+    })
+    res: Response,
+  ) {
+    return await this.authService.signup(signupDto, res);
   }
 
   @Post("login")
-  async login(@Body() loginDto: LoginDto, @Res() res: Response) {
+  login(
+    @Body() loginDto: LoginDto,
+    @Res({
+      passthrough: true,
+    })
+    res: Response,
+  ) {
     return this.authService.login(loginDto, res);
   }
 
