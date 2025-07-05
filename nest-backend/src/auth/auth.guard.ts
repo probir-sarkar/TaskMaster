@@ -4,6 +4,14 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
+export interface JwtPayload {
+  id: number;
+  name: string;
+}
+
+export interface RequestWithUser extends Request {
+  user: JwtPayload;
+}
 
 @Injectable()
 export class CookieAuthGuard implements CanActivate {
@@ -17,7 +25,7 @@ export class CookieAuthGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token);
+      const payload: JwtPayload = await this.jwtService.verifyAsync(token);
       request.user = payload; // 👤 Attach user to request
     } catch (error) {
       throw new UnauthorizedException("Invalid token");

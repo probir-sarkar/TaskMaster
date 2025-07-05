@@ -6,12 +6,36 @@ import { PrismaService } from "src/prisma/prisma.service";
 @Injectable()
 export class TaskService {
   constructor(private readonly prisma: PrismaService) {}
-  create(createTaskDto: CreateTaskDto) {
-    return "This action adds a new task";
+  async create(userId: number, createTaskDto: CreateTaskDto) {
+    const task = await this.prisma.$transaction(async (prisma) => {
+      await prisma.task.updateMany({
+        where: {
+          userId: userId,
+          status: "TODO",
+          position: {
+            gte: 0,
+          },
+        },
+        data: {
+          position: {
+            increment: 1,
+          },
+        },
+      });
+      const newTask = await prisma.task.create({
+        data: {
+          ...createTaskDto,
+          userId: userId,
+        },
+      });
+      return newTask;
+    });
+    return { success: true, data: task };
   }
 
-  findAll() {
-    return `This action returns all task`;
+  async findAll(userId: number) {
+    const tasks = await this.prisma.task.findMany({ where: { userId } });
+    return { success: true, data: tasks };
   }
 
   findOne(id: number) {

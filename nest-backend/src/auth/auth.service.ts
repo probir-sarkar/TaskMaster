@@ -3,6 +3,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { GoogleUserRequest } from "./strategies/google.strategy";
 import { JwtService } from "@nestjs/jwt";
 import type { CookieOptions, Response } from "express";
+import { JwtPayload } from "./auth.guard";
 
 @Injectable()
 export class AuthService {
@@ -15,7 +16,7 @@ export class AuthService {
     const { email, name, picture } = user;
     const foundUser = await this.prisma.user.findUnique({ where: { email } });
     if (foundUser) {
-      const payload = { id: foundUser.id, name: foundUser.name };
+      const payload: JwtPayload = { id: foundUser.id, name: foundUser.name || "" };
       const token = await this.jwtService.signAsync(payload);
       res.cookie("token", token, this.cookieParams);
       return res.redirect(`${process.env.CLIENT_URL}`);
@@ -32,7 +33,7 @@ export class AuthService {
         },
       },
     });
-    const payload = { id: newUser.id, name: newUser.name };
+    const payload: JwtPayload = { id: newUser.id, name: newUser.name || "" };
     const token = await this.jwtService.signAsync(payload);
     res.cookie("token", token, this.cookieParams);
     return res.redirect(`${process.env.CLIENT_URL}`);
