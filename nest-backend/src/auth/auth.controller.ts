@@ -1,10 +1,11 @@
-import { Controller, Get, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthGuard } from "@nestjs/passport";
 import { GoogleUserRequest } from "./strategies/google.strategy";
 import type { Response } from "express";
 import { CookieAuthGuard } from "./auth.guard";
 import { ConfigService } from "@nestjs/config";
+import { SignupDto } from "./dto/signup.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -12,6 +13,11 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
   ) {}
+
+  @Post("signup")
+  signup(@Body() signupDto: SignupDto) {
+    return this.authService.signup(signupDto);
+  }
 
   @Get("google")
   @UseGuards(AuthGuard("google"))
