@@ -16,13 +16,13 @@ export class AuthController {
   ) {}
 
   @Post("signup")
-  signup(@Body() signupDto: SignupDto) {
-    return this.authService.signup(signupDto);
+  signup(@Body() signupDto: SignupDto, @Res() res: Response) {
+    return this.authService.signup(signupDto, res);
   }
 
   @Post("login")
-  login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  login(@Body() loginDto: LoginDto, @Res() res: Response) {
+    return this.authService.login(loginDto, res);
   }
 
   @Get("google")

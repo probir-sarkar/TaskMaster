@@ -44,7 +44,7 @@ export class AuthService {
     return res.redirect(`${process.env.CLIENT_URL}`);
   }
 
-  async signup(body: SignupDto) {
+  async signup(body: SignupDto, res: Response) {
     const { email, password, name } = body;
     const foundUser = await this.prisma.user.findUnique({ where: { email } });
     if (foundUser) return { message: "Email already exists", success: false, alreadyExists: true };
@@ -61,10 +61,13 @@ export class AuthService {
         },
       },
     });
-    return user;
+    const payload: JwtPayload = { id: user.id, name: user.name || "" };
+    const token = await this.jwtService.signAsync(payload);
+    res.cookie("token", token, this.cookieParams);
+    return { message: "Signup successfully", success: true };
   }
 
-  async login(body: LoginDto) {
+  async login(body: LoginDto, res: Response) {
     const { email, password } = body;
     const user = await this.prisma.user.findUnique({ where: { email }, include: { additionalInfo: true } });
     if (!user) return { message: "Email not found", success: false };
@@ -75,7 +78,8 @@ export class AuthService {
     if (!isPasswordMatch) return { message: "Password is incorrect", success: false };
     const payload: JwtPayload = { id: user.id, name: user.name || "" };
     const token = await this.jwtService.signAsync(payload);
-    return { message: "Login successfully", success: true, token };
+    res.cookie("token", token, this.cookieParams);
+    return { message: "Login successfully", success: true };
   }
 
   get cookieParams(): CookieOptions {
