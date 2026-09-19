@@ -19,3 +19,23 @@ Pass the `CloudflareBindings` as generics when instantiating `Hono`:
 // src/index.ts
 const app = new Hono<{ Bindings: CloudflareBindings }>()
 ```
+
+## Database migrations (Drizzle + D1)
+
+Generate SQL migrations from `src/db/schema.ts` (outputs to `drizzle/migrations`):
+
+```txt
+npx drizzle-kit generate
+```
+
+Apply migrations to the local D1 database:
+
+```txt
+npx wrangler d1 migrations apply TaskMaster --local
+```
+
+Apply migrations to the remote D1 database:
+
+```txt
+npx wrangler d1 migrations apply TaskMaster --remote
+```
