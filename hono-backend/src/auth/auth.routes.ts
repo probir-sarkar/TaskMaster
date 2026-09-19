@@ -19,7 +19,7 @@ const TOKEN_MAX_AGE = 24 * 60 * 60; // 24 hours in seconds
 const cookieOptions = () => ({
   httpOnly: true,
   secure: true,
-  sameSite: "Strict" as const,
+  sameSite: "None" as const,
   maxAge: TOKEN_MAX_AGE
 });
 
