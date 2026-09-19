@@ -7,7 +7,9 @@
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
   "dependencies": {
+    "@hono/oauth-providers": "^0.9.0",
     "@hono/zod-validator": "^0.9.1",
+    "@types/node": "^26.6.2",
     "dotenv": "^18.0.1",
     "drizzle-orm": "^1.0.0-rc.4",
     "hono": "^4.13.8",
