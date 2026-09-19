@@ -1,5 +1,5 @@
 {
-  "name": "hono-backend",
+  "name": "taskmaster-api",
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",

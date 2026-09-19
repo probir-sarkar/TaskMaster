@@ -13,7 +13,7 @@ app.get("/", (c) => {
 app.use(
   "/api/*",
   cors({
-    origin: (origin, c) => (origin === c.env.CLIENT_URL ? origin : undefined),
+    origin: ["https://task-master.probir.dev", "http://localhost:5173"],
     credentials: true
   })
 );

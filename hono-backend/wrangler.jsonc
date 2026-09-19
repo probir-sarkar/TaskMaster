@@ -1,11 +1,11 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "hono-backend",
+  "name": "taskmaster-api",
   "main": "src/index.ts",
   "compatibility_date": "2026-09-19",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
+  "preview_urls": false,
+  "workers_dev": false,
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },
@@ -18,7 +18,7 @@
   // "r2_buckets": [
   //   {
   //     "binding": "MY_BUCKET",
-  //     "bucket_name": "my-bucket"
+  //     "bucket_name": "my-bucket"https://task-master.probir.dev/
   //   }
   // ],
   "d1_databases": [
